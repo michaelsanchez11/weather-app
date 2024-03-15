@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Weather App JPM</string>
+    <string name="search_bar_hint_text">Search …</string>
 </resources>
