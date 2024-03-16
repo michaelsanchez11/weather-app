@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Weather App JPM</string>
     <string name="search_bar_hint_text">Search …</string>
+    <string name="network_error_toast">You seem to be offline, try again or view your saved locations.</string>
 </resources>

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.weatherappjpm.R
@@ -61,11 +62,17 @@ class SearchFragment : Fragment() {
 
         searchViewModel.localDbData.observe(viewLifecycleOwner) { localData ->
             weatherDataTexView.text = localData?.toString() ?: ""
-            Log.d("Michael", "Local Data $localData")
         }
 
         searchViewModel.networkData.observe(viewLifecycleOwner) { networkData ->
             weatherDataTexView.text = networkData?.toString() ?: ""
+        }
+
+        searchViewModel.networkConnected.observe(viewLifecycleOwner) { networkConnected ->
+            if (!networkConnected) {
+                Toast.makeText(context, getString(R.string.network_error_toast), Toast.LENGTH_LONG).show()
+                searchViewModel.setNetworkConnected(true)
+            }
         }
     }
 

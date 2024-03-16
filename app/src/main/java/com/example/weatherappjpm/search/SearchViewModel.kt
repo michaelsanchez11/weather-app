@@ -38,6 +38,10 @@ class SearchViewModel @Inject constructor(
         _searchQuery.value = queryData
     }
 
+    fun setNetworkConnected(isConnected: Boolean) {
+        _networkConnected.value = isConnected
+    }
+
     fun fetchNetworkData(cityName: String, apiKey: String) {
         if (!networkHelper.isNetworkConnected()) {
             _networkConnected.value = false
@@ -71,7 +75,7 @@ class SearchViewModel @Inject constructor(
                 }
 
                 override fun onFailure(call: Call<WeatherForecastResponse>, t: Throwable) {
-                    Log.d("Michael", "Error fetching weather data", t)
+                    Log.d(TAG, "Error fetching weather data", t)
                 }
             })
         }
