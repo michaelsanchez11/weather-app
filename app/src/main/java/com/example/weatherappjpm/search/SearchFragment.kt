@@ -3,6 +3,7 @@ package com.example.weatherappjpm.search
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,8 +44,19 @@ class SearchFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
+        searchViewModel.fetchLocalDbData()
+        searchViewModel.fetchNetworkData()
+
         searchViewModel.searchQuery.observe(viewLifecycleOwner) { query ->
             performSearch(query)
+        }
+
+        searchViewModel.localDbData.observe(viewLifecycleOwner) { localData ->
+            Log.d("Michael", "Local Data $localData")
+        }
+
+        searchViewModel.networkData.observe(viewLifecycleOwner) { networkData ->
+            Log.d("Michael", "Network Data $networkData")
         }
     }
 
