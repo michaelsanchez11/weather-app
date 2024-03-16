@@ -1,12 +1,11 @@
 package com.example.weatherappjpm.search
 
-import android.content.Context
-import android.net.ConnectivityManager
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.weatherappjpm.WeatherData
 import com.example.weatherappjpm.data.DataRepository
 import com.example.weatherappjpm.data.network.NetworkHelper
 import com.example.weatherappjpm.data_models.WeatherForecastResponse
@@ -25,8 +24,8 @@ class SearchViewModel @Inject constructor(
     private val _searchQuery = MutableLiveData<String>()
     val searchQuery: LiveData<String> = _searchQuery
 
-    private val _networkData = MutableLiveData<List<String>>()
-    val networkData: LiveData<List<String>> = _networkData
+    private val _networkData = MutableLiveData<WeatherData?>()
+    val networkData: LiveData<WeatherData?> = _networkData
 
     private val _localDbData = MutableLiveData<List<String>>()
     val localDbData: LiveData<List<String>> = _localDbData
@@ -53,7 +52,14 @@ class SearchViewModel @Inject constructor(
                 override fun onResponse(call: Call<WeatherForecastResponse>, response: Response<WeatherForecastResponse>) {
                     if (response.isSuccessful) {
                         val data = response.body()
-                        Log.d("Michael", "It worked $data")
+
+                        val weatherData = WeatherData(
+                            data?.city?.name.toString(),
+                            data?.weatherDataList
+                        )
+                        _networkData.postValue(weatherData)
+                    } else {
+                        _networkData.postValue(null)
                     }
                     _isLoading.postValue(false)
                 }

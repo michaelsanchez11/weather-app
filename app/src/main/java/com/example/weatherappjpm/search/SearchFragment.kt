@@ -7,7 +7,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.weatherappjpm.R
@@ -17,6 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class SearchFragment : Fragment() {
     private lateinit var searchViewModel: SearchViewModel
     private lateinit var searchBar: EditText
+    private lateinit var weatherDataTexView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,6 +28,7 @@ class SearchFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.search_fragment, container, false)
         searchBar = view.findViewById(R.id.searchEditText)
+        weatherDataTexView = view.findViewById(R.id.weather_data)
 
         return view
     }
@@ -44,23 +48,27 @@ class SearchFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        searchViewModel.fetchLocalDbData()
-        searchViewModel.fetchNetworkData("Soledad", getString(R.string.weather_api_key))
-
-        searchViewModel.searchQuery.observe(viewLifecycleOwner) { query ->
-            performSearch(query)
+        searchBar.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                performSearch(searchBar.text.toString())
+                true
+            } else {
+                false
+            }
         }
+
+        searchViewModel.fetchLocalDbData()
 
         searchViewModel.localDbData.observe(viewLifecycleOwner) { localData ->
             Log.d("Michael", "Local Data $localData")
         }
 
         searchViewModel.networkData.observe(viewLifecycleOwner) { networkData ->
-            Log.d("Michael", "Network Data $networkData")
+            weatherDataTexView.text = networkData?.toString() ?: ""
         }
     }
 
     private fun performSearch(query: String) {
-        // vm call to api(query)
+        searchViewModel.fetchNetworkData(query, getString(R.string.weather_api_key))
     }
 }
