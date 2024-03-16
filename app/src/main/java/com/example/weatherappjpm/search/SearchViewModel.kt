@@ -5,10 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherappjpm.WeatherData
+import com.example.weatherappjpm.DisplayWeatherData
 import com.example.weatherappjpm.data.DataRepository
 import com.example.weatherappjpm.data.network.NetworkHelper
 import com.example.weatherappjpm.data_models.WeatherForecastResponse
+import com.example.weatherappjpm.room.WeatherData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -24,14 +25,11 @@ class SearchViewModel @Inject constructor(
     private val _searchQuery = MutableLiveData<String>()
     val searchQuery: LiveData<String> = _searchQuery
 
-    private val _networkData = MutableLiveData<WeatherData?>()
-    val networkData: LiveData<WeatherData?> = _networkData
+    private val _networkData = MutableLiveData<DisplayWeatherData?>()
+    val networkData: LiveData<DisplayWeatherData?> = _networkData
 
-    private val _localDbData = MutableLiveData<List<String>>()
-    val localDbData: LiveData<List<String>> = _localDbData
-
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _localDbData = MutableLiveData<WeatherData?>()
+    val localDbData: LiveData<WeatherData?> = _localDbData
 
     private val _networkConnected = MutableLiveData<Boolean>()
     val networkConnected: LiveData<Boolean> = _networkConnected
@@ -55,26 +53,33 @@ class SearchViewModel @Inject constructor(
 
                         val weatherData = WeatherData(
                             data?.city?.name.toString(),
-                            data?.weatherDataList
-                        )
-                        _networkData.postValue(weatherData)
+                            System.currentTimeMillis(),
+                            data?.weatherDataList)
+
+                        val displayData = DisplayWeatherData(
+                            data?.city?.name.toString(),
+                            data?.weatherDataList)
+
+                        _networkData.postValue(displayData)
+
+                        viewModelScope.launch {
+                            dataRepository.insertWeatherData(weatherData)
+                        }
                     } else {
                         _networkData.postValue(null)
                     }
-                    _isLoading.postValue(false)
                 }
 
                 override fun onFailure(call: Call<WeatherForecastResponse>, t: Throwable) {
                     Log.d("Michael", "Error fetching weather data", t)
-                    _isLoading.postValue(false)
                 }
             })
         }
     }
 
-    fun fetchLocalDbData() {
+    fun fetchMostRecentLocationSearched() {
         viewModelScope.launch {
-            _localDbData.value = dataRepository.fetchDataFromDatabase()
+            _localDbData.value = dataRepository.fetchMostRecentWeatherDataFromDatabase()
         }
     }
 

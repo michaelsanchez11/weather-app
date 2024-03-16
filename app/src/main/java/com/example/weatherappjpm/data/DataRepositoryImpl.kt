@@ -3,6 +3,7 @@ package com.example.weatherappjpm.data
 import com.example.weatherappjpm.data.local.LocalDataSource
 import com.example.weatherappjpm.data.network.RemoteDataSource
 import com.example.weatherappjpm.data_models.WeatherForecastResponse
+import com.example.weatherappjpm.room.WeatherData
 import retrofit2.Call
 import javax.inject.Inject
 
@@ -14,7 +15,11 @@ class DataRepositoryImpl @Inject constructor(
         return remoteDataSource.fetchDataFromApi(cityName,apiKey)
     }
 
-    override suspend fun fetchDataFromDatabase(): List<String> {
-        return localDataSource.fetchDataFromDatabase()
+    override suspend fun fetchMostRecentWeatherDataFromDatabase(): WeatherData? {
+        return localDataSource.fetchMostRecentWeatherDataFromDatabase()
+    }
+
+    override suspend fun insertWeatherData(weatherData: WeatherData) {
+        localDataSource.insertWeatherData(weatherData)
     }
 }

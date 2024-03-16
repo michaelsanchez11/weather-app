@@ -57,9 +57,10 @@ class SearchFragment : Fragment() {
             }
         }
 
-        searchViewModel.fetchLocalDbData()
+        searchViewModel.fetchMostRecentLocationSearched()
 
         searchViewModel.localDbData.observe(viewLifecycleOwner) { localData ->
+            weatherDataTexView.text = localData?.toString() ?: ""
             Log.d("Michael", "Local Data $localData")
         }
 
