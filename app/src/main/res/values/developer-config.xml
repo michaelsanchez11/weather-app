@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="weather_api_key" translatable="false" tools:ignore="UnusedResources">f29c7c77f7f5de2caa22ad9c92e2fe54</string>
+</resources>

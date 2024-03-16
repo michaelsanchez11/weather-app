@@ -45,7 +45,7 @@ class SearchFragment : Fragment() {
         })
 
         searchViewModel.fetchLocalDbData()
-        searchViewModel.fetchNetworkData()
+        searchViewModel.fetchNetworkData("Soledad", getString(R.string.weather_api_key))
 
         searchViewModel.searchQuery.observe(viewLifecycleOwner) { query ->
             performSearch(query)
