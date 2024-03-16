@@ -42,6 +42,45 @@ class SearchViewModel @Inject constructor(
         _networkConnected.value = isConnected
     }
 
+    fun fetchNetworkDataByLocation(lat: Double, lon: Double, apiKey: String) {
+        if (!networkHelper.isNetworkConnected()) {
+            _networkConnected.value = false
+            return
+        }
+
+        viewModelScope.launch {
+            val call = dataRepository.fetchDataWithLocationFromApi(lat, lon, apiKey)
+            call.enqueue(object : Callback<WeatherForecastResponse> {
+                override fun onResponse(call: Call<WeatherForecastResponse>, response: Response<WeatherForecastResponse>) {
+                    if (response.isSuccessful) {
+                        val data = response.body()
+
+                        val weatherData = WeatherData(
+                            data?.city?.name.toString(),
+                            System.currentTimeMillis(),
+                            data?.weatherDataList)
+
+                        val displayData = DisplayWeatherData(
+                            data?.city?.name.toString(),
+                            data?.weatherDataList)
+
+                        _networkData.postValue(displayData)
+
+                        viewModelScope.launch {
+                            dataRepository.insertWeatherData(weatherData)
+                        }
+                    } else {
+                        _networkData.postValue(null)
+                    }
+                }
+
+                override fun onFailure(call: Call<WeatherForecastResponse>, t: Throwable) {
+                    Log.d(TAG, "Error fetching weather data", t)
+                }
+            })
+        }
+    }
+
     fun fetchNetworkData(cityName: String, apiKey: String) {
         if (!networkHelper.isNetworkConnected()) {
             _networkConnected.value = false

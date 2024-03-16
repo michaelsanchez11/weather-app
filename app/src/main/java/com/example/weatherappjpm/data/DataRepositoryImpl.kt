@@ -22,4 +22,8 @@ class DataRepositoryImpl @Inject constructor(
     override suspend fun insertWeatherData(weatherData: WeatherData) {
         localDataSource.insertWeatherData(weatherData)
     }
+
+    override suspend fun fetchDataWithLocationFromApi(lat: Double, lon: Double, apiKey: String): Call<WeatherForecastResponse> {
+        return remoteDataSource.fetchDataWithLocationFromApi(lat, lon, apiKey)
+    }
 }
